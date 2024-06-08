@@ -26,7 +26,7 @@ t_slots = st.sidebar.slider("t_slots", min_value=10, max_value=2000, value=600)
 grid_size = st.sidebar.slider("grid_size", min_value=10, max_value=200, value=30)
 interval = st.sidebar.slider("interval", min_value=10, max_value=500, value=50)
 
-@st.cache_data  # Cache the generation of points
+@st.cache_data  
 def generate_points(mu, C, beta, sigma_x, sigma_y, T_start, T_end, S_x_min, S_x_max, S_y_min, S_y_max):
     kernel = StdDiffusionKernel(C=C, beta=beta, sigma_x=sigma_x, sigma_y=sigma_y)
     lam = HawkesLam(mu, kernel, maximum=1e+3)
