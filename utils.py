@@ -24,7 +24,7 @@ def lebesgue_measure(S):
     return np.prod(sub_lebesgue_ms)
 
 @st.cache_data  
-def plot_combined_intensity_and_events(lam, points, S, t_slots, grid_size, interval):
+def plot_combined_intensity_and_events(_lam, points, S, t_slots, grid_size, interval):
     """
     Plot spatial intensity and event locations over time. The left plot shows the intensity heatmap,
     and the right plot shows the event locations appearing at their specific time slots.
@@ -46,7 +46,7 @@ def plot_combined_intensity_and_events(lam, points, S, t_slots, grid_size, inter
         for x_idx in range(grid_size):
             for y_idx in range(grid_size):
                 s                  = [x_span[x_idx], y_span[y_idx]]
-                _map[x_idx][y_idx] = lam.value(t, sub_seq_t, s, sub_seq_s)
+                _map[x_idx][y_idx] = _lam.value(t, sub_seq_t, s, sub_seq_s)
         return _map
     # prepare the heatmap data in advance
     print('[%s] preparing the dataset %d × (%d, %d) for plotting.' %
