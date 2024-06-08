@@ -22,7 +22,7 @@ S_x_min = st.sidebar.slider("S_x_min", min_value=-10.0, max_value=10.0, value=-1
 S_x_max = st.sidebar.slider("S_x_max", min_value=-10.0, max_value=10.0, value=1.0)
 S_y_min = st.sidebar.slider("S_y_min", min_value=-10.0, max_value=10.0, value=-1.0)
 S_y_max = st.sidebar.slider("S_y_max", min_value=-10.0, max_value=10.0, value=1.0)
-t_slots = st.sidebar.slider("t_slots", min_value=10, max_value=2000, value=500)
+t_slots = st.sidebar.slider("t_slots", min_value=10, max_value=2000, value=600)
 grid_size = st.sidebar.slider("grid_size", min_value=10, max_value=200, value=30)
 interval = st.sidebar.slider("interval", min_value=10, max_value=500, value=50)
 
