@@ -12,7 +12,7 @@ from matplotlib.animation import PillowWriter
 from matplotlib.backends.backend_pdf import PdfPages
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.stats import multivariate_normal
-import streamlit as st  # Import Streamlit
+import streamlit as st  
 
 def lebesgue_measure(S):
     """
@@ -23,6 +23,7 @@ def lebesgue_measure(S):
     sub_lebesgue_ms = [ sub_space[1] - sub_space[0] for sub_space in S ]
     return np.prod(sub_lebesgue_ms)
 
+@st.cache_data  
 def plot_combined_intensity_and_events(lam, points, S, t_slots, grid_size, interval):
     """
     Plot spatial intensity and event locations over time. The left plot shows the intensity heatmap,
