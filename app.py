@@ -62,10 +62,13 @@ points, lam = generate_points(mu, C, beta, sigma_x, sigma_y, T_start, T_end, S_x
 diffusion_kernel_formula = r"$\nu(t, s, t_i, s_i) = \exp(-\beta (t - t_i)) \frac{C}{2 \pi \sigma_x \sigma_y (t - t_i)} \exp \left(- \frac{1}{2 (t - t_i)} \left(\frac{(s_x - s_{i,x})^2}{\sigma_x^2} + \frac{(s_y - s_{i,y})^2}{\sigma_y^2} \right) \right)$"
 
 # Hawkes process formula
-hawkes_process_formula = r"$\lambda(t, s) = \mu + \sum_{t_i < t} \nu(t, s, t_i, s_i)$"
+hawkes_process_formula = r"$\lambda(s, t, H_t) = \mu g_0(s) + \sum_{(t_i, s_i) \in H_t} g_1(t, t_i) g_2(s, s_i)$"
+
 
 st.write(f"### Standard Diffusion Kernel Formula\n\n{diffusion_kernel_formula}")
 st.write(f"### Hawkes Process Formula\n\n{hawkes_process_formula}")
+st.write(r"$g_0$, $g_1$, and $g_2$ are probably constants !")
+
 
 plot_combined_intensity_and_events(
     lam, points[0], 
