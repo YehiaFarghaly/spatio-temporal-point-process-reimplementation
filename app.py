@@ -15,7 +15,7 @@ st.sidebar.title("Parameter Settings")
 tooltips = {
     "mu": "Background intensity of the Hawkes process.",
     "C": "Constant scaling factor for the diffusion kernel.",
-    "beta": "Decay rate of the influence of past events.",
+    "beta": "Temporal Decay rate of the influence of past events.",
     "sigma_x": "Standard deviation of spatial diffusion in the x-direction.",
     "sigma_y": "Standard deviation of spatial diffusion in the y-direction.",
     "T_start": "Start time of the observation window.",
@@ -59,13 +59,21 @@ def generate_points(mu, C, beta, sigma_x, sigma_y, T_start, T_end, S_x_min, S_x_
 points, lam = generate_points(mu, C, beta, sigma_x, sigma_y, T_start, T_end, S_x_min, S_x_max, S_y_min, S_y_max)
 
 # Standard diffusion kernel formula
-diffusion_kernel_formula = r"$\nu(t, s, t_i, s_i) = \exp(-\beta (t - t_i)) \frac{C}{2 \pi \sigma_x \sigma_y (t - t_i)} \exp \left(- \frac{1}{2 (t - t_i)} \left(\frac{(s_x - s_{i,x})^2}{\sigma_x^2} + \frac{(s_y - s_{i,y})^2}{\sigma_y^2} \right) \right)$"
+diffusion_kernel_formula = r"""
+$k_s(s, s_i; \gamma_i) = \alpha^{-1} \exp \left( - \gamma_i \|s - s_i\| \right)$
+""" + r"""
+$k_t(t, t_i; \beta_i) = \exp \left( - \beta_i \|t - t_i\| \right)$
+""" + r"""
+$\gamma$ represents the spatial decay which depends on the squared distances in the x and y dimensions, scaled by the variances $\sigma_x^2$ and $\sigma_y^2$.
+
+$\alpha^{-1}$ represents the Spatial Normalization factor which includes the standard deviations in x and y directions $\sigma_x$ and $\sigma_y$.
+"""
 
 # Hawkes process formula
 hawkes_process_formula = r"$\lambda(s, t, H_t) = \mu g_0(s) + \sum_{(t_i, s_i) \in H_t} g_1(t, t_i) g_2(s, s_i)$"
 
 
-st.write(f"### Standard Diffusion Kernel Formula\n\n{diffusion_kernel_formula}")
+st.write(f"### Diffusion Kernel Formula\n\n{diffusion_kernel_formula}")
 st.write(f"### Hawkes Process Formula\n\n{hawkes_process_formula}")
 st.write(r"$g_0$, $g_1$, and $g_2$ are probably constants !")
 
