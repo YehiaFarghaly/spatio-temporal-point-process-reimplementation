@@ -23,139 +23,25 @@ class StdDiffusionKernel(object):
     """
     Kernel function including the diffusion-type model proposed by Musmeci and
     Vere-Jones (1992).
-    The diffusion kernel defines how data points diffusses over time, it outputs
-    a probability density function taht descripes how likely the current state
-    is originated from the history state
+    The diffusion kernel defines how data points diffuse over time, it outputs
+    a probability density function that describes how likely the current state
+    is originated from the history state.
     """
-    def __init__(self, C=1., beta=1., sigma_x=1., sigma_y=1.):
-        self.C       = C    ## constant scaling factor
-        self.beta    = beta ## the strength of the diffusion process
-        self.sigma_x = sigma_x ## standard diviation for the diffusion in x
-        self.sigma_y = sigma_y ## standard diviation for the diffusion in x
+    def __init__(self, beta=1., gamma=10., alpha=16.):
+        self.beta = beta  
+        self.gamma = gamma  
+        self.alpha = alpha  
 
     def nu(self, t, s, his_t, his_s):
         delta_s = s - his_s
         delta_t = t - his_t
         delta_x = delta_s[:, 0]
         delta_y = delta_s[:, 1]
-        return np.exp(- self.beta * delta_t) * \
-            (self.C / (2 * np.pi * self.sigma_x * self.sigma_y * delta_t)) * \
-            np.exp((- 1. / (2 * delta_t)) * \
-                ((np.square(delta_x) / np.square(self.sigma_x)) + \
-                (np.square(delta_y) / np.square(self.sigma_y))))
-
-
-
-class GaussianDiffusionKernel(object):
-    """
-    A Gaussian diffusion kernel function based on the standard kernel function proposed 
-    by Musmeci and Vere-Jones (1992). The angle and shape of diffusion ellipse is able  
-    to vary according to the location.  
-    """
-    def __init__(self, mu_x=0., mu_y=0., sigma_x=1., sigma_y=1., rho=0., beta=1., C=1.):
-        # kernel parameters
-        self.C                     = C # kernel constant
-        self.beta                  = beta
-        self.mu_x, self.mu_y       = mu_x, mu_y 
-        self.sigma_x, self.sigma_y = sigma_x, sigma_y
-        self.rho                   = rho
-
-    def nu(self, t, s, his_t, his_s):
-        delta_s = s - his_s
-        delta_t = t - his_t
-        delta_x = delta_s[:, 0]
-        delta_y = delta_s[:, 1]
-        gaussian_val = np.exp(- self.beta * delta_t) * \
-            (self.C / (2 * np.pi * self.sigma_x * self.sigma_y * delta_t * np.sqrt(1 - np.square(self.rho)))) * \
-            np.exp((- 1. / (2 * delta_t * (1 - np.square(self.rho)))) * \
-                ((np.square(delta_x - self.mu_x) / np.square(self.sigma_x)) + \
-                (np.square(delta_y - self.mu_y) / np.square(self.sigma_y)) - \
-                (2 * self.rho * (delta_x - self.mu_x) * (delta_y - self.mu_y) / (self.sigma_x * self.sigma_y))))
-        return gaussian_val
-
         
-
-class GaussianMixtureDiffusionKernel(object):
-    """
-    A Gaussian mixture diffusion kernel function is superposed by multiple Gaussian diffusion 
-    kernel function. The number of the Gaussian components is specified by n_comp. 
-    """
-    def __init__(self, n_comp, w, mu_x, mu_y, sigma_x, sigma_y, rho, beta=1., C=1.):
-        self.gdks   = []     # Gaussian components
-        self.n_comp = n_comp # number of Gaussian components
-        self.w      = w      # weighting vectors for Gaussian components
-        # Gaussian mixture component initialization
-        for k in range(self.n_comp):
-            gdk = GaussianDiffusionKernel(
-                mu_x=mu_x[k], mu_y=mu_y[k], sigma_x=sigma_x[k], sigma_y=sigma_y[k], rho=rho[k], beta=beta, C=C)
-            self.gdks.append(gdk)
-    
-    def nu(self, t, s, his_t, his_s):
-        nu = 0
-        for k in range(self.n_comp):
-            nu += self.w[k] * self.gdks[k].nu(t, s, his_t, his_s)
-        return nu
-
-
-
-class SpatialVariantGaussianDiffusionKernel(object):
-    """
-    Spatial Variant Gaussian diffusion kernel function
-    """
-    def __init__(self, 
-        f_mu_x=lambda x, y: 0., f_mu_y=lambda x, y: 0., 
-        f_sigma_x=lambda x, y: 1., f_sigma_y=lambda x, y: 1., 
-        f_rho=lambda x, y: 0., beta=1., C=1.):
-        # kernel parameters
-        self.C                     = C # kernel constant
-        self.beta                  = beta
-        self.mu_x, self.mu_y       = f_mu_x, f_mu_y 
-        self.sigma_x, self.sigma_y = f_sigma_x, f_sigma_y
-        self.rho                   = f_rho
-
-    def nu(self, t, s, his_t, his_s):
-        delta_s = s - his_s
-        delta_t = t - his_t
-        delta_x = delta_s[:, 0]
-        delta_y = delta_s[:, 1]
-        mu_xs, mu_ys, sigma_xs, sigma_ys, rhos = \
-            self.mu_x(his_s[:,0], his_s[:,1]),\
-            self.mu_y(his_s[:,0], his_s[:,1]),\
-            self.sigma_x(his_s[:,0], his_s[:,1]),\
-            self.sigma_y(his_s[:,0], his_s[:,1]),\
-            self.rho(his_s[:,0], his_s[:,1])
-        gaussian_val = np.exp(- self.beta * delta_t) * \
-            (self.C / (2 * np.pi * sigma_xs * sigma_ys * delta_t * np.sqrt(1 - np.square(rhos)))) * \
-            np.exp((- 1. / (2 * delta_t * (1 - np.square(rhos)))) * \
-                ((np.square(delta_x - mu_xs) / np.square(sigma_xs)) + \
-                (np.square(delta_y - mu_ys) / np.square(sigma_ys)) - \
-                (2 * rhos * (delta_x - mu_xs) * (delta_y - mu_ys) / (sigma_xs * sigma_ys))))
-        return gaussian_val
-
-
-
-class SpatialVariantGaussianMixtureDiffusionKernel(object):
-    """
-    Spatial Variant Gaussian mixture diffusion kernel function
-    """
-    def __init__(self, n_comp, w, f_mu_x, f_mu_y, f_sigma_x, f_sigma_y, f_rho, beta=1., C=1.):
-        # kernel parameters
-        self.gdks   = []     # Gaussian components
-        self.n_comp = n_comp # number of Gaussian components
-        self.w      = w      # weighting vectors for Gaussian components
-        # Gaussian mixture component initialization
-        for k in range(self.n_comp):
-            gdk = SpatialVariantGaussianDiffusionKernel(
-                f_mu_x=f_mu_x[k], f_mu_y=f_mu_y[k], 
-                f_sigma_x=f_sigma_x[k], f_sigma_y=f_sigma_y[k], 
-                f_rho=f_rho[k], beta=beta, C=C)
-            self.gdks.append(gdk)
-
-    def nu(self, t, s, his_t, his_s):
-        nu = 0
-        for k in range(self.n_comp):
-            nu += self.w[k] * self.gdks[k].nu(t, s, his_t, his_s)
-        return nu
+        spatial_component = self.alpha * np.exp(-self.gamma * np.sqrt(np.square(delta_x) + np.square(delta_y)))
+        temporal_component = np.exp(-self.beta * delta_t)
+        
+        return temporal_component * spatial_component
 
 
 
