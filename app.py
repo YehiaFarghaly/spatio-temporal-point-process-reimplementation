@@ -55,11 +55,7 @@ diffusion_kernel_formula = r"""
 $g_t(t, t_i; \beta_i) = \exp \left( - \beta_i \|t - t_i\| \right)$
 """ +r"""
 $g_s(s, s_i; \gamma_i) = \alpha^{-1} \exp \left( - \gamma_i \|s - s_i\| \right)$
-""" + r"""
-$\gamma$ represents the spatial decay which depends on the squared distances in the x and y dimensions, scaled by the variances $\sigma_x^2$ and $\sigma_y^2$.
-
-$\alpha^{-1}$ represents the Spatial Normalization factor which includes the standard deviations in x and y directions $\sigma_x$ and $\sigma_y$.
-"""
+""" 
 
 # Hawkes process formula
 hawkes_process_formula = r"$\lambda(s, t, H_t) = \mu + \sum_{(t_i, s_i) \in H_t} g_t(t, t_i) g_s(s, s_i)$"
